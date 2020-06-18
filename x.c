@@ -260,9 +260,10 @@ static char *opt_title = NULL;
 
 static int oldbutton = 3; /* button event on startup: 3 = release */
 
-static int is_fullscreen = 0;
 void toggle_full(const Arg *arg)
 {
+    static int is_fullscreen = 0;
+
     Atom wm_state = XInternAtom(xw.dpy, "_NET_WM_STATE", False);
     Atom fullscreen_state = XInternAtom(xw.dpy, "_NET_WM_STATE_FULLSCREEN",  False);
     
@@ -1637,7 +1638,7 @@ xstartdraw(void)
 }
 
 void
-xdrawline(Line line, int x1, int y1, int x2)
+xdrawline(Line line, int x1, int y1, int x2, int urlstart, int urlend)
 {
 	int i, x, ox, numspecs;
 	Glyph base, new;
@@ -1646,11 +1647,15 @@ xdrawline(Line line, int x1, int y1, int x2)
 	numspecs = xmakeglyphfontspecs(specs, &line[x1], x2 - x1, x1, y1);
 	i = ox = 0;
 	for (x = x1; x < x2 && i < numspecs; x++) {
+        int offset = (x2 - x1) * y1 + x;
 		new = line[x];
 		if (new.mode == ATTR_WDUMMY)
 			continue;
 		if (selected(x, y1))
 			new.mode ^= ATTR_REVERSE;
+        if ((offset >= urlstart) && (offset <= urlend) && urlstart > 0 && urlend > 0) {
+            new.mode ^= ATTR_UNDERLINE;
+        }
 		if (i > 0 && ATTRCMP(base, new)) {
 			xdrawglyphfontspecs(specs, base, i, ox, y1);
 			specs += i;

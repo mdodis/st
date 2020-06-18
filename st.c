@@ -505,6 +505,28 @@ selnormalize(void)
 		sel.ne.x = term.col - 1;
 }
 
+int isurl(Line l, int x1, int x2, int *urlend) {
+    *urlend = -1;
+
+    int xstart = x1;
+    while (xstart < x2) {
+        if (x2 - xstart < 4) return 0;
+
+        if (l[xstart].u == 'h' && l[xstart+1].u == 't' && l[xstart+2].u == 't' && l[xstart+3].u == 'p') {
+            for (int x = x1 + 4; x < x2; ++x) {
+                if ((l[x].u == ' ')) {
+                    *urlend = x;
+                    break;
+                }
+            }
+            return 1;
+        }
+        xstart++;
+    }
+
+    return 0;
+}
+
 int
 selected(int x, int y)
 {
@@ -2642,17 +2664,58 @@ resettitle(void)
 	xsettitle(NULL);
 }
 
+int 
+region_url_start(int x1, int y1, int x2, int y2)
+{
+    for (int y = y1; y < y2; ++y) {
+        Line l = TLINE(y);
+        for (int x = x1; x < x2; ++x) {
+            if ((x2 - x) < 4) break;
+
+            if (l[x].u == 'h' &&
+                l[x+1].u == 't' &&
+                l[x+2].u == 't' &&
+                l[x+3].u == 'p') {
+                return (x2 - x1) * y + x;
+            }
+        }
+    }
+    return -1;
+}
+
+int region_url_end(int x1, int y1, int x2, int y2, int start) {
+    if (start == -1) return -1;
+
+    for (int y = y1; y < y2; ++y) {
+        Line l = TLINE(y);
+        for (int x = x1; x < x2; ++x) {
+            int offset = (x2 - x1) * y + x;
+            if (offset >= (start + 4)) {
+                if (l[x].u == ' ') return offset;
+            }
+        }
+    }
+    return -1;
+}
+
+typedef int Region[2];
+
 void
 drawregion(int x1, int y1, int x2, int y2)
 {
-	int y;
+	int y, urlstart, urlend;
 
+    urlstart = -1;
+    urlend = -1;
 	for (y = y1; y < y2; y++) {
 		if (!term.dirty[y])
 			continue;
 
+        /* urlstart = region_url_start(x1, y, x2, y2); */
+        /* urlend = region_url_end(x1, y, x2, y2, urlstart); */
+
 		term.dirty[y] = 0;
-		xdrawline(TLINE(y), x1, y, x2);
+        xdrawline(TLINE(y), x1, y, x2, urlstart, urlend);
 	}
 }
 
