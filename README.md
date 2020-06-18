@@ -33,7 +33,7 @@ See the man page for additional details.
 On debian systems, run sudo make install-alternatives (x-terminal-emulator change)
 
 If you're using nautilus (it uses a hardcoded list of terminals, 
-and st is not one of them), a simple hack would be to add this is your ~/.bashrc file:
+and st is not one of them), a simple hack would be to add this to your ~/.bashrc file:
 
 ``` bash
 if ps -o cmd= -p $(ps -o ppid= -p $$) | grep -q gnome; then
