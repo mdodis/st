@@ -51,13 +51,14 @@ install: st
 	@echo Please see the README file regarding the terminfo entry of st.
 	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
 	cp -f st.desktop $(DESTDIR)$(PREFIX)/share/applications
-
-install-alternatives: st
-	sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/bin/st 100
+	update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/bin/st 100
+	cp st.svg /usr/share/pixmaps/
+	update-desktop-database
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/st
 	rm -f $(DESTDIR)$(MANPREFIX)/man1/st.1
 	rm -f $(DESTDIR)$(PREFIX)/share/applications/st.desktop
+	rm -f /usr/share/pixmaps/st.svg
 
 .PHONY: all options clean dist install uninstall

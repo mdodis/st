@@ -2,6 +2,6 @@
 Type=Application
 Name=st
 Comment=simple-terminal emulator for X
-Icon=utilities-terminal
+Icon=st.svg
 Exec=st
 Categories=System;TerminalEmulator
